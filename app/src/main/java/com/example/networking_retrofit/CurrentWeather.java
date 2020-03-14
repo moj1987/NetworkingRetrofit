@@ -1,25 +1,28 @@
 package com.example.networking_retrofit;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
 public class CurrentWeather {
 
-    private int id;
+    private Main main;
 
-    @SerializedName("main")
-    private String current;
-
-    private String description;
-
-    public int getId() {
-        return id;
+    Main getMain() {
+        return main;
     }
 
-    public String getCurrent() {
-        return current;
-    }
 
-    public String getDescription() {
-        return description;
+    class Main {
+        double temp;
+        double pressure;
+
+        @NonNull
+        @Override
+        public String toString() {
+            return "temp=" + temp
+                    +", \n"
+                    +"pressure=" + pressure;
+        }
     }
 }

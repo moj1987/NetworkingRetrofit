@@ -15,6 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     private TextView textViewResult;
+    private OpenWeatherMapApi openWeatherMapApi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,15 +24,25 @@ public class MainActivity extends AppCompatActivity {
         textViewResult = findViewById(R.id.text_view);
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(" https://api.openweathermap.org/")
-                // .addConverterFactory(ScalarsConverterFactory.create())
+                //.baseUrl(" https://api.openweathermap.org/")
+                .baseUrl(" https://jsonplaceholder.typicode.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
-        OpenWeatherMapApi openWeatherMapApi = retrofit.create(OpenWeatherMapApi.class);
+        openWeatherMapApi = retrofit.create(OpenWeatherMapApi.class);
 
+        //callCurrentWeather();
+        //getPosts();
+        creatPost();
+    }
+
+    private void creatPost() {
+
+    }
+
+    private void callCurrentWeather() {
         Call<CurrentWeather> call =
-                openWeatherMapApi.getPosts("London", "17e3b4694f77e6f9a54f2a1012cce0a6");
+                openWeatherMapApi.getCurrentWeather("Toronto", "17e3b4694f77e6f9a54f2a1012cce0a6");
 
         call.enqueue(new Callback<CurrentWeather>() {
             @Override
@@ -44,15 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
                 CurrentWeather currentWeathers = response.body();
 
-                //for (CurrentWeather currentWeather : currentWeathers) {
+                //for (CurrentWeather currentWeather : currentWeathers)
                 String content = "";
-                content += "ID" + currentWeathers.getId() + "\n";
-                content += "main" + currentWeathers.getDescription() + "\n";
-
+                content += "" + currentWeathers.getMain() + "\n";
 
                 textViewResult.append(content);
 
-                //}
             }
 
             @Override
@@ -61,6 +69,35 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+    }
 
+    private void getPosts() {
+        Call<List<Post>> call = openWeatherMapApi.getPosts();
+
+        call.enqueue(new Callback<List<Post>>() {
+            @Override
+            public void onResponse(Call<List<Post>> call, Response<List<Post>> response) {
+                if (!response.isSuccessful()) {
+                    textViewResult.setText("Code: " + response.code());
+                    return;
+                }
+
+                List<Post> posts = response.body();
+
+                for (Post post : posts){
+                    String content = "";
+                content += "ID= " + post.getId() + "\n";
+                content += "User ID: " + post.getUserId() + "\n";
+                content += "Title: " + post.getTitle() + "\n";
+                content += "body: " + post.getBody() + "\n\n";
+
+                textViewResult.append(content);
+            }
+        }
+            @Override
+            public void onFailure(Call<List<Post>> call, Throwable t) {
+                textViewResult.setText(t.getMessage());
+            }
+            });
     }
 }
